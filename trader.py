@@ -439,22 +439,4 @@ class Trader(Features):
 
 
 if __name__ == "__main__":
-    apikey = "RLp4CqiVodskImFsw9pMDOOmyfxriLqCIpBl35MsE3OFh1JuPuulULmFWxGiZUma"
-    secret = "HRsiQ9UXiNa4QanC4ZPKHA126X5f8T4E3rOjyoPPVZ8M7lG1xUNfNt1n1PWrv5qo"
-    start = "2017"
-    end = "2020"
-    interval = "1d"
-    symbol = "ETCUSDT"
-    emas = [20, 40, 50, 60, 200]
-    volume_emas = [20, 40, 200]
-
-    app = Trader(apikey, secret)
-    start_time = int(app.date2timestamp(f"01/01/{start}") * 1000)
-    hist_data = app.get_historical_data(start_time)
-    df = app.candles2dataframe(hist_data)
-
-    df = app.add_features(df, emas, volume_emas)
-    print(df.tail())
-    print()
-    print(df.columns)
-
+    pass

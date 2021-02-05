@@ -390,7 +390,7 @@ class Trader(Features):
 
         return df_copy
 
-    def create_splits(df, lag=1, pct_split=0.95, scaler=None):
+    def create_splits(self, df, lag=1, pct_split=0.95, scaler=None):
         """
         Creates the training and validation splits for training
         the model.

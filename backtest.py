@@ -96,7 +96,7 @@ class SignalData(PandasData):
         columns = OHLCV + [prediction]
 
         # create lines
-        lines = tuple(self.cols)
+        lines = tuple(columns)
 
         # define parameters
         params = {c: -1 for c in columns}

@@ -13,6 +13,11 @@ from urllib.parse import urljoin, urlencode
 
 
 class Trader(Features):
+    """
+    It takes the binance apikey and secret key
+    to perform requests to the API
+    """
+
     BASE_URL = "https://api.binance.com"
 
     def __init__(self, api_key, secret_key):
@@ -27,7 +32,7 @@ class Trader(Features):
         """
         querystring = urlencode(params)
         signature = hmac.new(
-            secret.encode("utf-8"), querystring.encode("utf-8"), hashlib.sha256
+            self.secret_key.encode("utf-8"), querystring.encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
         return signature

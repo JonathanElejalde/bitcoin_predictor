@@ -13,7 +13,7 @@ class BackTester:
     """
     The index of the dataframe must be a datetime type. thus, 
     the columns that it is specting are open_time, open, high, low, close, 
-    volume, returns (true values), prediction (it could be in probabilities or classification)
+    volume, returns (true values), direction (it could be in probabilities or classification)
     """
 
     def __init__(self, df, prediction):
@@ -27,7 +27,7 @@ class BackTester:
         # instantiate SignalData class
         self.data = SignalData(self.prediction, dataname=self.df)
 
-    def run_backtest(self, symbol, cash, comission=0.001):
+    def run_backtest(self, symbol, cash, commission=0.001):
 
         # instantiate Cerebro, add strategy, data, initial cash, commission and pyfolio for performance analysis
         cerebro = bt.Cerebro(stdstats=False, cheat_on_open=True)
@@ -93,14 +93,14 @@ class SignalData(PandasData):
             the strategy
         """
         OHLCV = ["open", "high", "low", "close", "volume"]
-        columns = OHLCV + [prediction]
+        columns = OHLCV + ['direction']
 
         # create lines
         lines = tuple(columns)
 
         # define parameters
         params = {c: -1 for c in columns}
-        params.update({"datetime": None})
+        params.update({"datetime": "open_time"})
         params = tuple(params.items())
 
 

@@ -202,6 +202,22 @@ class Trader(client.Client):
 
         return train, test, train_targets, test_targets, scaler
 
+    def get_one_prediction_data(self, emas, volume_emas, **kwargs):
+        """
+        It gets the last 500 candles and adds the features. Then we return 
+        the resulting dataframe to be scaled.
+        
+        Note: We use several candles because we need to calculate
+        several features that need previous candles
+        """
+        candles = self.get_klines(**kwargs)
+        df = pd.DataFrame(candles)
+        df = self.format_df(df)
+        df = self.add_features(df, emas, volume_emas)
+        df.drop("open_time", axis=1, inplace=True)
+
+        return df.tail(2)
+
 
 if __name__ == "__main__":
     pass

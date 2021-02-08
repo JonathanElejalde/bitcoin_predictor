@@ -34,7 +34,7 @@ class BackTester:
         cerebro.addstrategy(MLStrategy)
         cerebro.adddata(self.data, name=symbol)
         cerebro.broker.setcash(cash)
-        cerebro.broker.setcommission(commission=comission)
+        cerebro.broker.setcommission(commission=commission)
         cerebro.addanalyzer(bt.analyzers.PyFolio, _name="pyfolio")
 
         # run the backtest
@@ -93,7 +93,7 @@ class SignalData(PandasData):
             the strategy
         """
         OHLCV = ["open", "high", "low", "close", "volume"]
-        columns = OHLCV + ['direction']
+        columns = OHLCV + ["direction"]
 
         # create lines
         lines = tuple(columns)

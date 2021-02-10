@@ -214,9 +214,16 @@ class Trader(client.Client):
         df = pd.DataFrame(candles)
         df = self.format_df(df)
         df = self.add_features(df, emas, volume_emas)
+
+        # Delete the last row because is the firts seconds of information
+        # of the candle that we want to predict
+        df.drop(df.tail(1).index, inplace=True)
+
+        # We remove open_time because it is not use for prediction
+        open_time = df["open_time"]
         df.drop("open_time", axis=1, inplace=True)
 
-        return df.tail(2)
+        return df.tail(1), open_time.tail(1)
 
 
 if __name__ == "__main__":

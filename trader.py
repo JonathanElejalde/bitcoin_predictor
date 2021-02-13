@@ -267,7 +267,7 @@ class Trader(client.Client):
             
         returns:
             data: pandas DataFrame. The candles to make predictions. There are not scaled
-            dates: pandas Series. The corresponding datetime for the data rows.
+            date: pandas Series. The corresponding datetime for the data.
 
         """
         candles = self.get_klines(**kwargs)
@@ -284,9 +284,9 @@ class Trader(client.Client):
         df.drop("open_time", axis=1, inplace=True)
 
         data = df.tail(num_candles)
-        dates = open_time.tail(num_candles)
+        date = open_time.tail(num_candles)
 
-        return data, dates
+        return data, date
 
     def model_data(
         self, emas, volume_emas, lag, interval, start_date, scaler, symbol="BTCUSDT"
@@ -328,6 +328,45 @@ class Trader(client.Client):
         y_test.to_csv("y_valid.csv", index=False)
 
         return X_train, X_valid, y_train, y_test, scaler
+
+    def make_prediction(
+        self, emas, volume_emas, symbol, interval, limit, scaler, model, num_candles=1
+    ):
+        """
+        It makes a prediction using a pre-trained model
+        
+        Args:
+            emas: list. a list of int with the periods for the emas
+            volume_emas: list. a list of int with the periods for the volume emas
+            symbol: str.
+            interval: str. klines interval
+            scaler: sklearn scaler object. The one used for scaling the training data
+            model: pre-trained model
+            num_candles: int. number of candles to get or the number of predictions to make
+            
+        returns:
+            pred: float. the model's prediction
+            open_time: datetime of the prediction
+        """
+        # Get the data to predict
+        data, open_time = self.get_one_prediction_data(
+            emas,
+            volume_emas,
+            symbol=symbol,
+            interval=interval,
+            limit=limit,
+            num_candles=num_candles,
+        )
+
+        # Scale the data
+        scaled_data = scaler.transform(data)
+
+        # predict with the scaled data
+        pred = model.predict(scaled_data)
+        pred = pred.squeeze()
+        open_time = open_time.values
+
+        return pred, open_time
 
 
 if __name__ == "__main__":

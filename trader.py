@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 import datetime
+import pickle
 
 from create_features import Features
 from binance import client
@@ -14,6 +16,48 @@ class Trader(client.Client):
 
     def __init__(self, api_key, secret_key):
         super().__init__(api_key, secret_key)
+
+    def load_model(self, path):
+        """
+        Loads a pre-trained tensorflow model
+        
+        Args:
+            path: str. the model's path
+        
+        returns: 
+            model: tensorflow model
+        """
+        model = tf.keras.models.load_model(path)
+
+        return model
+
+    def load_scaler(self, path):
+        """
+        Loads a serialized sklearn scaler object. Normally 
+        StandardScaler() or MinMaxScaler()
+        
+        Args:
+            path: str. The scaler's path
+        
+        returns:
+            scaler: sklearn scaler object
+        """
+        with open(path, "rb") as f:
+            scaler = pickle.load(f)
+
+        return scaler
+
+    def save_scaler(self, path, scaler):
+        """
+        Serializes a sklearn scaler object.
+        
+        Args:
+            path: str. Where to save the scaler
+            scaler: the sklearn scaler object used to 
+                transform the model's data
+        """
+        with open(path, "wb") as f:
+            pickle.dump(scaler, f)
 
     def timestamp2date(self, timestamp):
         """
@@ -233,8 +277,6 @@ class Trader(client.Client):
         df.drop("open_time", axis=1, inplace=True)
 
         return df.tail(1), open_time.tail(1)
-    
-    
 
 
 if __name__ == "__main__":

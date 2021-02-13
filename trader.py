@@ -255,13 +255,20 @@ class Trader(client.Client):
 
         return train, test, train_targets, test_targets, scaler
 
-    def get_one_prediction_data(self, emas, volume_emas, **kwargs):
+    def get_one_prediction_data(self, emas, volume_emas, num_candles=1, **kwargs):
         """
-        It gets the last 500 candles and adds the features. Then we return 
+        It gets the last LIMIT prices and adds the features. Then we return 
         the resulting dataframe to be scaled.
         
-        Note: We use several candles because we need to calculate
-        several features that need previous candles
+        Args:
+            emas: list. a list of int with the periods for the emas
+            volume_emas: list. a list of int with the periods for the volume emas
+            num_candles: int. the number of candles or rows that we return
+            
+        returns:
+            data: pandas DataFrame. The candles to make predictions. There are not scaled
+            dates: pandas Series. The corresponding datetime for the data rows.
+
         """
         candles = self.get_klines(**kwargs)
         df = pd.DataFrame(candles)
@@ -276,7 +283,51 @@ class Trader(client.Client):
         open_time = df["open_time"]
         df.drop("open_time", axis=1, inplace=True)
 
-        return df.tail(1), open_time.tail(1)
+        data = df.tail(num_candles)
+        dates = open_time.tail(num_candles)
+
+        return data, dates
+
+    def model_data(
+        self, emas, volume_emas, lag, interval, start_date, scaler, symbol="BTCUSDT"
+    ):
+        """
+        It creates the datasets for training a ml model
+        
+        Args:
+            emas: list. a list of int with the periods for the emas
+            volume_emas: list. a list of int with the periods for the volume emas
+            lag: int. the price to predict. If 1 it means the next candle
+            interval: str. klines interval
+            start_date: str. 
+            scaler: sklearn scaler object. Normally StandardScaler or MinMaxScaler
+            symbol: str.
+        
+        returns:
+            X_train: pandas dataframe. Features for training
+            X_valid: pandas dataframe. Features for validation
+            y_train: pandas dataframe. Targets for training
+            y_valid: pandas dataframe. Targets for validation
+            scaler: sklean scaler. Ready to transform new data
+        """
+
+        candles = self.get_historical_klines(symbol, interval, start_date)
+
+        df = pd.DataFrame(candles)
+        df = self.format_df(df)
+        df = self.add_features(df, emas, volume_emas)
+        df = self.create_target(df, lag=lag)
+        X_train, X_valid, y_train, y_test, scaler = self.create_splits(
+            df, lag=lag, scaler=scaler
+        )
+
+        # Save files to csv
+        X_train.to_csv("X_train.csv", index=False)
+        X_valid.to_csv("X_valid.csv", index=False)
+        y_train.to_csv("y_train.csv", index=False)
+        y_test.to_csv("y_valid.csv", index=False)
+
+        return X_train, X_valid, y_train, y_test, scaler
 
 
 if __name__ == "__main__":

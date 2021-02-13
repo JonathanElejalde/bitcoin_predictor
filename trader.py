@@ -8,8 +8,8 @@ from binance import client
 
 class Trader(client.Client):
     """
-    It takes the binance apikey and secret key
-    to perform requests to the API
+    This class adds functionalities to perform trades in Binance.
+    It requires the api and secret key from binance.
     """
 
     def __init__(self, api_key, secret_key):
@@ -25,6 +25,18 @@ class Trader(client.Client):
         return correct_date
 
     def format_df(self, df):
+        """
+        Takes the raw klines from binance and adds them the correct
+        column names. It also keeps the most relevant columns
+        and transforms the string values to numeric values.
+        
+        Args:
+            df: pandas DataFrame. It contains the raw klines from binance
+        
+        returns:
+            df_copy: pandas DataFrame. It contains correct column names
+                and correct dtypes.
+        """
         df_copy = df.copy()
         # These are the column names from binance api data
         columns = [
@@ -128,9 +140,6 @@ class Trader(client.Client):
 
         return df_copy
 
-    def save_df(self, df, filename):
-        df.to_csv(filename, index=False)
-
     def create_target(self, df, lag=1):
         """
         Calculates the log returns using the requested lag.
@@ -224,6 +233,8 @@ class Trader(client.Client):
         df.drop("open_time", axis=1, inplace=True)
 
         return df.tail(1), open_time.tail(1)
+    
+    
 
 
 if __name__ == "__main__":

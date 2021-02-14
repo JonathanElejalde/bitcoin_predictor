@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import datetime
 import pickle
+import math
 
 from create_features import Features
 from binance import client
@@ -368,7 +369,63 @@ class Trader(client.Client):
 
         return pred, open_time
 
+    def check_filters(self, price, quantity, symbol):
+        """
+        Fixes the lot_size  and price_filter filters when
+        needed.
+        Args:
+            price: float. the buying or selling price
+            quantity: float. amount of units to buy or sell
+            symbol: str.
+            
+        returns:
+            price: float. fixed buying or selling price
+            quantity: float. fixed amount of units
+        """
+
+        for filt in self.get_symbol_info(symbol=symbol)["filters"]:
+            if filt["filterType"] == "LOT_SIZE":
+                ticks = filt["stepSize"].find("1") - 2
+                quantity = math.floor(quantity * 10 ** ticks) / float(10 ** ticks)
+                continue
+
+            elif filt["filterType"] == "PRICE_FILTER":
+                ticks = filt["tickSize"].find("1") - 2
+                price = math.floor(price * 10 ** ticks) / float(10 ** ticks)
+                continue
+            else:
+                continue
+
+        return price, quantity
+
+    def sell_coins(current_price, items):
+        cash = items * current_price
+
+        return cash
+
+    def sell_buy(self, coin, buy=True, price=None, quantity=None, cash=None):
+        """
+        This functions is for testing purposes. When buying, we need to pass the cash
+        and when selling we need to pass the quantity.
+        
+        """
+        info = self.get_ticker(symbol=coin["symbol"])
+
+        if price == None:
+            price = float(info["lastPrice"])
+
+        if buy:
+            quantity = cash / price
+            print(f"Bought {quantity} of {coin['name']} at {price}")
+
+            return quantity
+
+        else:
+            cash = quantity * price
+            print(f"Sold {quantity} of {coin['name']} at {price}")
+
+            return cash
+
 
 if __name__ == "__main__":
     pass
-

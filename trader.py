@@ -398,11 +398,6 @@ class Trader(client.Client):
 
         return price, quantity
 
-    def sell_coins(current_price, items):
-        cash = items * current_price
-
-        return cash
-
     def sell_buy(self, coin, buy=True, price=None, quantity=None, cash=None):
         """
         This functions is for testing purposes. When buying, we need to pass the cash

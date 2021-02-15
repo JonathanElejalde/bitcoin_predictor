@@ -57,7 +57,8 @@ def buy(trader, coin, test=False, cash=None):
 
     balance = float(trader.get_asset_balance(asset="USDT")["free"])
     buy_info = trader.get_ticker(symbol=coin["symbol"])
-    buy_price = float(buy_info["askPrice"])
+    # We could try with askPrice, lastPrice as well
+    buy_price = float(buy_info["lastPrice"])
     quantity = round(float(balance / buy_price) * 0.995, 6)
     buy_price, quantity = trader.check_filters(buy_price, quantity, coin["symbol"])
 
@@ -86,8 +87,8 @@ def buy(trader, coin, test=False, cash=None):
 
 def sell(trader, coin, quantity, test=False):
     sell_info = trader.get_ticker(symbol=coin["symbol"])
-    # We could try with lastPrice as well
-    sell_price = float(sell_info["bidPrice"])
+    # We could try with bidPrice, lastPrice as well
+    sell_price = float(sell_info["lastPrice"])
     sell_price, quantity = trader.check_filters(sell_price, quantity, coin["symbol"])
 
     print(f"sell_price and quantity after filters {(sell_price, quantity)}")
@@ -149,7 +150,7 @@ while True:
             continue
         else:
             # Wait some seconds to get the final candle
-            time.sleep(1)
+            time.sleep(2)
 
             # If we have a position, we sell
             if position:

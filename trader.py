@@ -404,9 +404,8 @@ class Trader(client.Client):
         and when selling we need to pass the quantity.
         
         """
-        info = self.get_ticker(symbol=coin["symbol"])
-
         if price == None:
+            info = self.get_ticker(symbol=coin["symbol"])
             price = float(info["lastPrice"])
 
         if buy:

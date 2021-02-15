@@ -65,9 +65,7 @@ def buy(trader, coin, test=False, cash=None):
 
     if test:
         balance = cash
-        quantity = trader.sell_buy(
-            coin, price=buy_price, quantity=quantity, cash=balance
-        )
+        quantity = trader.sell_buy(coin, price=buy_price, cash=balance)
 
         return quantity
 
@@ -95,7 +93,7 @@ def sell(trader, coin, quantity, test=False):
     print(f"sell_price and quantity after filters {(sell_price, quantity)}")
 
     if test:
-        cash = trader.sell_buy(coin, buy=False, quantity=quantity)
+        cash = trader.sell_buy(coin, buy=False, price=sell_price, quantity=quantity)
         print(f"#### CURRENT CASH: {cash} ####")
 
         return cash

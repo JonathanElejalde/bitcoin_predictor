@@ -5,8 +5,8 @@ import pandas as pd
 from trader import Trader
 import datetime
 
-# Strategy: Calculate predictions for all coins if there are more than one above the threshold; we will
-# buy the one with the highest prediction probability. If we have a current position,
+# Strategy: Calculate predictions for all coins. If there are more than one above the threshold, we will
+# buy the one with the highest prediction probability. Also, when we have a current position, we
 # sell that position and calculate all predictions again.
 
 

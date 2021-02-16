@@ -113,42 +113,39 @@ def sell(trader, coin, quantity, test=False):
         print(f"#### CURRENT CASH: {trader.get_asset_balance(asset='USDT')} ####")
 
 
-# Instantiate trader
-trader = Trader(config.API_KEY, config.SECRET_KEY)
+if __name__ == "__main__":
+    # Instantiate trader
+    trader = Trader(config.API_KEY, config.SECRET_KEY)
 
-# load models and scalers
-currencies = dict()
-for i, name in enumerate(config.NAMES):
-    currencies[name] = dict()
-    currencies[name]["symbol"] = config.SYMBOLS[i]
-    currencies[name]["threshold"] = config.THRESHOLDS[i]
-    currencies[name]["name"] = name
-    currencies[name]["model"] = trader.load_model(
-        f"data\\{config.NAMES[i]}\\5m_{config.NAMES[i]}.h5"
-    )
-    currencies[name]["scaler"] = trader.load_scaler(
-        f"data\\{config.NAMES[i]}\\{config.NAMES[i]}_scaler.pickle"
-    )
+    # load models and scalers
+    currencies = dict()
+    for i, name in enumerate(config.NAMES):
+        currencies[name] = dict()
+        currencies[name]["symbol"] = config.SYMBOLS[i]
+        currencies[name]["threshold"] = config.THRESHOLDS[i]
+        currencies[name]["name"] = name
+        currencies[name]["model"] = trader.load_model(
+            f"data\\{config.NAMES[i]}\\{config.INTERVAL}_{config.NAMES[i]}.h5"
+        )
+        currencies[name]["scaler"] = trader.load_scaler(
+            f"data\\{config.NAMES[i]}\\{config.INTERVAL}_{config.NAMES[i]}_scaler.pickle"
+        )
 
-print("########## Models and scalers loaded #############")
+    print("########## Models and scalers loaded #############")
 
-# Saves the last minute in which the app maked a prediction
-last = None
+    # Checks if we are in a current position and the coin of the position
+    position = False
+    buyed_coin = None
 
-# Checks if we are in a current position and the coin of the position
-position = False
-buyed_coin = None
+    # main loop
+    while True:
+        date = datetime.datetime.now()
+        minutes = date.minute
+        seconds = date.second
 
-# main loop
-while True:
-    date = datetime.datetime.now()
-    minutes = date.minute
-    seconds = date.second
+        if (minutes in [00, 15, 30, 45]) and (seconds == 1):
+            
 
-    if (minutes % 5 == 0) and (seconds == 1):
-        if last == minutes:
-            continue
-        else:
             # Wait some seconds to get the final candle
             time.sleep(2)
 

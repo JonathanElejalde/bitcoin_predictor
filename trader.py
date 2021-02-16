@@ -322,12 +322,6 @@ class Trader(client.Client):
             df, lag=lag, scaler=scaler
         )
 
-        # Save files to csv
-        X_train.to_csv("X_train.csv", index=False)
-        X_valid.to_csv("X_valid.csv", index=False)
-        y_train.to_csv("y_train.csv", index=False)
-        y_test.to_csv("y_valid.csv", index=False)
-
         return X_train, X_valid, y_train, y_test, scaler
 
     def make_prediction(

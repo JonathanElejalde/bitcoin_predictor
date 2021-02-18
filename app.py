@@ -16,7 +16,10 @@ def calculate_max_pred(currencies):
     preds_df = pd.DataFrame(
         columns=["open_time", "name", "symbol", "threshold", "prediction",]
     )
-    for name in config.NAMES:
+
+    # TO DO: Parallelize this predictions because it is taking too many seconds
+
+    for name, _, _ in config.COIN_INFO:
         coin = currencies[name]
 
         pred, open_time = trader.make_prediction(
@@ -59,7 +62,7 @@ def buy(trader, coin, test=False, cash=None):
     buy_info = trader.get_ticker(symbol=coin["symbol"])
     # We could try with askPrice, lastPrice as well
     buy_price = float(buy_info["lastPrice"])
-    quantity = round(float(balance / buy_price) * 0.995, 6)
+    quantity = round(float(balance / buy_price), 6)
     buy_price, quantity = trader.check_filters(buy_price, quantity, coin["symbol"])
 
     print(f"buy_price and quantity after filters:\n{(buy_price, quantity)}")
@@ -72,6 +75,7 @@ def buy(trader, coin, test=False, cash=None):
 
     else:
         buy_order = trader.create_test_order(
+        # buy_order = trader.create_order(
             symbol=coin["symbol"],
             side="BUY",
             type="LIMIT",
@@ -85,10 +89,12 @@ def buy(trader, coin, test=False, cash=None):
         return quantity
 
 
-def sell(trader, coin, quantity, test=False):
+def sell(trader, coin, test=False):
     sell_info = trader.get_ticker(symbol=coin["symbol"])
     # We could try with bidPrice, lastPrice as well
     sell_price = float(sell_info["lastPrice"])
+    asset = coin["name"].upper()
+    quantity = float(trader.get_asset_balance(asset=asset)["free"])
     sell_price, quantity = trader.check_filters(sell_price, quantity, coin["symbol"])
 
     print(f"sell_price and quantity after filters {(sell_price, quantity)}")
@@ -101,6 +107,7 @@ def sell(trader, coin, quantity, test=False):
 
     else:
         sell_order = trader.create_test_order(
+        #sell_order = trader.create_order(
             symbol=coin["symbol"],
             side="SELL",
             type="LIMIT",
@@ -110,28 +117,14 @@ def sell(trader, coin, quantity, test=False):
         )
 
         print(f"SELL ORDER: \n{sell_order}")
-        print(f"#### CURRENT CASH: {trader.get_asset_balance(asset='USDT')} ####")
 
 
 if __name__ == "__main__":
     # Instantiate trader
     trader = Trader(config.API_KEY, config.SECRET_KEY)
 
-    # load models and scalers
-    currencies = dict()
-    for i, name in enumerate(config.NAMES):
-        currencies[name] = dict()
-        currencies[name]["symbol"] = config.SYMBOLS[i]
-        currencies[name]["threshold"] = config.THRESHOLDS[i]
-        currencies[name]["name"] = name
-        currencies[name]["model"] = trader.load_model(
-            f"data\\{config.NAMES[i]}\\{config.INTERVAL}_{config.NAMES[i]}.h5"
-        )
-        currencies[name]["scaler"] = trader.load_scaler(
-            f"data\\{config.NAMES[i]}\\{config.INTERVAL}_{config.NAMES[i]}_scaler.pickle"
-        )
-
-    print("########## Models and scalers loaded #############")
+    # Get currencies
+    currencies = config.get_currencies(trader, config.COIN_INFO, config.INTERVAL)
 
     # Checks if we are in a current position and the coin of the position
     position = False
@@ -144,14 +137,13 @@ if __name__ == "__main__":
         seconds = date.second
 
         if (minutes in [00, 15, 30, 45]) and (seconds == 1):
-            
 
             # Wait some seconds to get the final candle
             time.sleep(2)
 
             # If we have a position, we sell
             if position:
-                sell(trader, buyed_coin, quantity, test=config.TEST)
+                sell(trader, buyed_coin, test=config.TEST)
 
                 # update position
                 position = False

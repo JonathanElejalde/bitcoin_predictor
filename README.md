@@ -1,8 +1,8 @@
-# Predict cripto using deep learning
+# Predict crypto using deep learning
 
 ### Description
 
-This app uses the historical data of different cripto currencies to train deep learning models for each currency and predict
+This app uses the historical data of different crypto currencies to train deep learning models for each currency and predict
 the currency direction price.
 
 The app is mainly based on the Trader class which inheritates from the backtrader.client.Client adding more functionalities to make much easier the

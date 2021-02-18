@@ -19,6 +19,20 @@ docker build -f Dockerfile -t ml_strategy .
 
 ### Usage
 
+Before we run the container, make sure to add your own keys for the binance API.
+You can do this by adding keys.py as follows:
+
+```python
+api_key = "your api key"
+secret_key = "your secret key"
+```
+
+or you can just add them directly in the app.py file when calling:
+
+```python
+trader = Trader('your api key', 'your secret key')
+```
+
 After this, we can run the app using the container
 ```console
 docker run -v %cd%:/strategy -ti ml_strategy /bin/bash -c "cd strategy && python -W ignore app.py"

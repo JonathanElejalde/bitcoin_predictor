@@ -56,5 +56,5 @@ thinking too much in making money.
 
 ### IMPORTANT
 
-The app.py is an example and not a reliable way of making money. Thus, I recommend not to use this as a real trading strategy. However, 
+The app.py is an example and not a reliable way of making money. Thus, I recommend not to use it as a real trading strategy. However, 
 you can use the concepts in this file to build your own reliable strategy.

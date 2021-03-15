@@ -13,7 +13,7 @@ training, prediction, buy and sell of the currencies.
 To start, we need to create the docker image
 ```console
 git clone https://github.com/JonathanElejalde/playing_with_btc.git
-
+cd playing_with_btc
 docker build -f Dockerfile -t ml_strategy .
 ```
 
